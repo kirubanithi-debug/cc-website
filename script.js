@@ -27,71 +27,65 @@ function initScrollDrivenLogos() {
     if (!logoRows.length) return;
     
     let lastScrollY = window.scrollY;
-    let scrollVelocity = 0;
+    let isInitialized = false;
     
-    // Store transform values for each row
+    // Store data for each row
     const rowData = [];
-    logoRows.forEach((row, index) => {
-        const track = row.querySelector('.scroll-logo-track');
-        if (!track) return;
-        const direction = row.dataset.direction || 'left';
-        rowData.push({
-            track: track,
-            direction: direction,
-            currentX: 0,
-            maxScroll: track.scrollWidth / 2 // Half because we duplicate items
+    
+    function initializeRows() {
+        rowData.length = 0;
+        logoRows.forEach((row) => {
+            const track = row.querySelector('.scroll-logo-track');
+            if (!track) return;
+            const direction = row.dataset.direction || 'left';
+            // Half width = one complete set of logos
+            const halfWidth = track.scrollWidth / 2;
+            rowData.push({
+                track: track,
+                direction: direction,
+                currentX: 0,
+                halfWidth: halfWidth
+            });
+            // Start at position 0 - logos visible from left
+            track.style.transform = `translateX(0px)`;
         });
-    });
+        isInitialized = true;
+    }
+    
+    // Wait for images to load
+    setTimeout(initializeRows, 100);
     
     function updateLogos() {
+        if (!isInitialized) return;
+        
         const currentScrollY = window.scrollY;
         const scrollDelta = currentScrollY - lastScrollY;
         
-        // Calculate velocity with smoother damping
-        scrollVelocity = scrollDelta * 0.8;
-        
-        rowData.forEach((data, index) => {
-            // Direction multiplier - alternate rows move in opposite directions
+        rowData.forEach((data) => {
+            // Direction: left = move left when scroll down
             const dirMultiplier = data.direction === 'left' ? 1 : -1;
             
-            // Update position based on scroll velocity
-            data.currentX += scrollVelocity * dirMultiplier;
+            // Update position based on scroll
+            data.currentX += scrollDelta * 0.8 * dirMultiplier;
             
-            // Keep values positive for consistent looping
+            // Keep within bounds for seamless loop
             if (data.currentX < 0) {
-                data.currentX += data.maxScroll;
+                data.currentX += data.halfWidth;
+            } else if (data.currentX >= data.halfWidth) {
+                data.currentX = data.currentX % data.halfWidth;
             }
             
-            // Loop the animation seamlessly
-            if (data.currentX >= data.maxScroll) {
-                data.currentX = data.currentX % data.maxScroll;
-            }
-            
-            // Apply transform with GPU acceleration
-            data.track.style.transform = `translate3d(${-data.currentX}px, 0, 0)`;
+            // Apply transform
+            data.track.style.transform = `translateX(${-data.currentX}px)`;
         });
         
         lastScrollY = currentScrollY;
     }
     
-    // Throttled scroll handler for performance
-    let ticking = false;
-    
+    // Scroll listener
     window.addEventListener('scroll', () => {
-        if (!ticking) {
-            requestAnimationFrame(() => {
-                updateLogos();
-                ticking = false;
-            });
-            ticking = true;
-        }
+        requestAnimationFrame(updateLogos);
     }, { passive: true });
-    
-    // Initial position - start from center
-    rowData.forEach(data => {
-        data.currentX = data.maxScroll / 4;
-        data.track.style.transform = `translateX(${-data.currentX}px)`;
-    });
 }
 
 /* ========================================
