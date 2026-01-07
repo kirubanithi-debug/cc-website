@@ -23,15 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
    ======================================== */
 function initScrollDrivenLogos() {
     const logoRows = document.querySelectorAll('.scroll-logo-row');
-    
+
     if (!logoRows.length) return;
-    
+
     let lastScrollY = window.scrollY;
     let isInitialized = false;
-    
+
     // Store data for each row
     const rowData = [];
-    
+
     function initializeRows() {
         rowData.length = 0;
         logoRows.forEach((row) => {
@@ -44,44 +44,49 @@ function initScrollDrivenLogos() {
                 track: track,
                 direction: direction,
                 currentX: 0,
+                targetX: 0,
                 halfWidth: halfWidth
             });
             // Start at position 0 - logos visible from left
             track.style.transform = `translateX(0px)`;
+            track.style.transition = 'transform 0.15s cubic-bezier(0.25, 0.1, 0.25, 1)';
         });
         isInitialized = true;
     }
-    
+
     // Wait for images to load
     setTimeout(initializeRows, 100);
-    
+
     function updateLogos() {
         if (!isInitialized) return;
-        
+
         const currentScrollY = window.scrollY;
         const scrollDelta = currentScrollY - lastScrollY;
-        
+
         rowData.forEach((data) => {
             // Direction: left = move left when scroll down
             const dirMultiplier = data.direction === 'left' ? 1 : -1;
-            
-            // Update position based on scroll
-            data.currentX += scrollDelta * 0.8 * dirMultiplier;
-            
+
+            // Update target position based on scroll (increased multiplier for more movement)
+            data.targetX += scrollDelta * 1.5 * dirMultiplier;
+
             // Keep within bounds for seamless loop
-            if (data.currentX < 0) {
-                data.currentX += data.halfWidth;
-            } else if (data.currentX >= data.halfWidth) {
-                data.currentX = data.currentX % data.halfWidth;
+            if (data.targetX < 0) {
+                data.targetX += data.halfWidth;
+            } else if (data.targetX >= data.halfWidth) {
+                data.targetX = data.targetX % data.halfWidth;
             }
-            
-            // Apply transform
+
+            // Smooth interpolation for buttery movement
+            data.currentX += (data.targetX - data.currentX) * 0.12;
+
+            // Apply transform with smooth transition
             data.track.style.transform = `translateX(${-data.currentX}px)`;
         });
-        
+
         lastScrollY = currentScrollY;
     }
-    
+
     // Scroll listener
     window.addEventListener('scroll', () => {
         requestAnimationFrame(updateLogos);
@@ -133,19 +138,57 @@ function initMobileMenu() {
 }
 
 /* ========================================
-   SMOOTH SCROLLING
+   SMOOTH SCROLLING - Premium Buttery Smooth
    ======================================== */
 function initSmoothScroll() {
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Custom easing function - ease-out-expo for premium feel
+    function easeOutExpo(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    }
+
+    // Premium smooth scroll function
+    function smoothScrollTo(targetPosition, duration = 1200) {
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const progress = Math.min(timeElapsed / duration, 1);
+            const easeProgress = easeOutExpo(progress);
+
+            window.scrollTo(0, startPosition + distance * easeProgress);
+
+            if (timeElapsed < duration) {
+                requestAnimationFrame(animation);
+            }
+        }
+
+        requestAnimationFrame(animation);
+    }
+
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const targetId = this.getAttribute('href');
+            const target = document.querySelector(targetId);
+
             if (target) {
                 const offsetTop = target.offsetTop - 80;
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
-                });
+
+                // Use native smooth scroll for reduced motion, custom for others
+                if (prefersReducedMotion) {
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'auto'
+                    });
+                } else {
+                    smoothScrollTo(offsetTop, 1000);
+                }
             }
         });
     });
@@ -374,52 +417,58 @@ function initStickyCardStack() {
     function updateCards() {
         const containerRect = container.getBoundingClientRect();
         const windowHeight = window.innerHeight;
-        
+
         stickyCards.forEach((card, index) => {
             const cardInner = card.querySelector('.portfolio-card-inner');
             if (!cardInner) return;
 
             const rect = card.getBoundingClientRect();
-            
+
             // How far the card has been scrolled past the sticky point (top: 0)
             // When card is stuck at top and we keep scrolling, its parent moves up
             // We detect this by checking how far into the card's scroll area we are
             const cardOffsetTop = card.offsetTop;
             const scrollProgress = Math.max(0, -containerRect.top - cardOffsetTop + windowHeight);
             const cardScrollRange = windowHeight; // Each card gets one viewport of scroll
-            
+
             // Normalize progress: 0 = card just became active, 1 = ready to transition to next
             let progress = scrollProgress / cardScrollRange;
             progress = Math.max(0, Math.min(1, progress));
-            
+
             // Check if this card is the "active" one (stuck at top, being scrolled)
             const isStuck = rect.top <= 0 && rect.bottom > 0;
             const nextCard = stickyCards[index + 1];
-            
+
             if (isStuck && nextCard) {
                 const nextRect = nextCard.getBoundingClientRect();
-                
+
                 // Calculate how much the next card has entered the viewport
                 // nextRect.top: starts at windowHeight, goes to 0 as it reaches top
                 const nextProgress = Math.max(0, 1 - (nextRect.top / windowHeight));
-                
-                // Apply effects based on next card's approach
-                const scale = 1 - (nextProgress * 0.12); // Scale down to 0.88
-                const blur = nextProgress * 10; // Max 10px blur
-                const yOffset = nextProgress * -30; // Move up slightly
-                
+
+                // Apply effects based on next card's approach (slower, smoother transitions)
+                const scale = 1 - (nextProgress * 0.15); // Scale down to 0.85 for more dramatic effect
+                const blur = nextProgress * 8; // Max 8px blur (softer)
+                const yOffset = nextProgress * -50; // Move up more for dramatic effect
+                const opacity = 1 - (nextProgress * 0.3); // Fade slightly
+
+                cardInner.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s ease-out, opacity 0.4s ease-out';
                 cardInner.style.transform = `scale(${scale}) translateY(${yOffset}px)`;
                 cardInner.style.filter = `blur(${blur}px)`;
-                
+                cardInner.style.opacity = opacity;
+
             } else if (!isStuck && rect.top > 0) {
                 // Card hasn't reached sticky point yet - normal state
+                cardInner.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s ease-out, opacity 0.4s ease-out';
                 cardInner.style.transform = 'scale(1) translateY(0)';
                 cardInner.style.filter = 'blur(0px)';
-                
+                cardInner.style.opacity = '1';
+
             } else if (rect.bottom <= 0) {
                 // Card has scrolled completely out - fully shrunk
-                cardInner.style.transform = 'scale(0.88) translateY(-30px)';
-                cardInner.style.filter = 'blur(10px)';
+                cardInner.style.transform = 'scale(0.85) translateY(-50px)';
+                cardInner.style.filter = 'blur(8px)';
+                cardInner.style.opacity = '0.7';
             }
 
             // Video control - play when visible and not blurred
@@ -427,7 +476,7 @@ function initStickyCardStack() {
             if (video) {
                 const currentBlur = parseFloat(cardInner.style.filter.replace(/[^0-9.]/g, '')) || 0;
                 if (currentBlur < 3 && video.paused && rect.top < windowHeight && rect.bottom > 0) {
-                    video.play().catch(() => {});
+                    video.play().catch(() => { });
                 } else if (currentBlur >= 3 && !video.paused) {
                     video.pause();
                 }
