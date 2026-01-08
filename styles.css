@@ -209,6 +209,15 @@ video {
     color: var(--primary-red);
 }
 
+.logo-img {
+    height: 50px;
+    max-height: 50px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    display: block;
+}
+
 /* Mobile Navigation */
 .nav-links {
     position: fixed;
