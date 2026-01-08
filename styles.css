@@ -57,8 +57,81 @@
     --glass-blur-strong: 40px;
 }
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* ========================================
+   LOCAL FONTS - Inter & Bebas Neue
+   ======================================== */
+
+/* Inter - Light (300) */
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/Inter-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Inter - Regular (400) */
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/Inter-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Inter - Medium (500) */
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/Inter-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Inter - SemiBold (600) */
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/Inter-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Inter - Bold (700) */
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/Inter-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Inter - ExtraBold (800) */
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/Inter-ExtraBold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Inter - Black (900) */
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/Inter-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Bebas Neue - Regular */
+@font-face {
+    font-family: 'Bebas Neue';
+    src: url('fonts/BebasNeue-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* Reset & Base */
 *,

@@ -650,10 +650,13 @@ function initScrollAnimations() {
 }
 
 /* ========================================
-   CONTACT FORM HANDLING
+   CONTACT FORM HANDLING - Google Sheets Integration
    ======================================== */
 function initContactForm() {
     const form = document.getElementById('contactForm');
+
+    // TODO: Replace with your Google Apps Script Web App URL
+    const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
 
     if (!form) return;
 
@@ -664,21 +667,42 @@ function initContactForm() {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
 
-        // Here you would typically send the data to a server
-        console.log('Form submitted:', data);
-
-        // Show success message (you can replace this with actual API call)
+        // Show loading state
         const btn = form.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
+        btn.innerHTML = '<span>Sending...</span>';
+        btn.disabled = true;
 
-        btn.innerHTML = '<span>Message Sent! ✓</span>';
-        btn.style.background = '#22c55e';
+        // Send to Google Sheets
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(() => {
+                // Success
+                btn.innerHTML = '<span>Message Sent! ✓</span>';
+                btn.style.background = '#22c55e';
 
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = '';
-            form.reset();
-        }, 3000);
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                    form.reset();
+                }, 3000);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                btn.innerHTML = '<span>Error. Try again.</span>';
+                btn.style.background = '#ef4444';
+
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 3000);
+            });
     });
 }
 
