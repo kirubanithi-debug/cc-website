@@ -72,8 +72,8 @@ function initScrollDrivenLogos() {
         rowData.forEach((data) => {
             const dirMultiplier = data.direction === 'left' ? 1 : -1;
 
-            // Direct position update - no interpolation for snappier response
-            data.currentX += scrollDelta * 0.5 * dirMultiplier;
+            // Direct position update - faster scroll speed
+            data.currentX += scrollDelta * 1.5 * dirMultiplier;
 
             // Seamless loop wrap
             if (data.currentX < 0) {
@@ -101,23 +101,45 @@ function initScrollDrivenLogos() {
 
 /* ========================================
    NAVBAR SCROLL EFFECT
+   Hide on scroll down, show on scroll up
    ======================================== */
 function initNavbar() {
     const navbar = document.getElementById('navbar');
     let lastScroll = 0;
+    let ticking = false;
 
-    window.addEventListener('scroll', () => {
+    function updateNavbar() {
         const currentScroll = window.pageYOffset;
 
-        // Add/remove scrolled class
+        // Add/remove scrolled class for background effect
         if (currentScroll > 50) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
 
+        // Hide/show navbar based on scroll direction
+        if (currentScroll <= 0) {
+            // At top of page - always show
+            navbar.classList.remove('nav-hidden');
+        } else if (currentScroll > lastScroll && currentScroll > 80) {
+            // Scrolling down & past header - hide navbar
+            navbar.classList.add('nav-hidden');
+        } else if (currentScroll < lastScroll) {
+            // Scrolling up - show navbar
+            navbar.classList.remove('nav-hidden');
+        }
+
         lastScroll = currentScroll;
-    });
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateNavbar);
+        }
+    }, { passive: true });
 }
 
 /* ========================================
