@@ -67,8 +67,8 @@ function initScrollDrivenLogos() {
             // Direction: left = move left when scroll down
             const dirMultiplier = data.direction === 'left' ? 1 : -1;
 
-            // Update target position based on scroll (increased multiplier for more movement)
-            data.targetX += scrollDelta * 1.5 * dirMultiplier;
+            // Update target position based on scroll (SLOWER movement for elegant feel)
+            data.targetX += scrollDelta * 0.4 * dirMultiplier;
 
             // Keep within bounds for seamless loop
             if (data.targetX < 0) {
@@ -77,8 +77,8 @@ function initScrollDrivenLogos() {
                 data.targetX = data.targetX % data.halfWidth;
             }
 
-            // Smooth interpolation for buttery movement
-            data.currentX += (data.targetX - data.currentX) * 0.12;
+            // Smooth interpolation for buttery movement (slower easing)
+            data.currentX += (data.targetX - data.currentX) * 0.08;
 
             // Apply transform with smooth transition
             data.track.style.transform = `translateX(${-data.currentX}px)`;
@@ -87,9 +87,32 @@ function initScrollDrivenLogos() {
         lastScrollY = currentScrollY;
     }
 
-    // Scroll listener
+    // Continuous animation loop for smoother movement on all devices
+    let animationId;
+    function animate() {
+        updateLogos();
+        animationId = requestAnimationFrame(animate);
+    }
+
+    // Start animation loop
+    animate();
+
+    // Also respond to scroll events for immediate feedback
     window.addEventListener('scroll', () => {
         requestAnimationFrame(updateLogos);
+    }, { passive: true });
+
+    // Touch support for mobile devices
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+        const touchY = e.touches[0].clientY;
+        const delta = touchStartY - touchY;
+        lastScrollY -= delta * 0.5; // Smoother touch response
+        touchStartY = touchY;
     }, { passive: true });
 }
 
@@ -446,29 +469,29 @@ function initStickyCardStack() {
                 // nextRect.top: starts at windowHeight, goes to 0 as it reaches top
                 const nextProgress = Math.max(0, 1 - (nextRect.top / windowHeight));
 
-                // Apply effects based on next card's approach (slower, smoother transitions)
-                const scale = 1 - (nextProgress * 0.15); // Scale down to 0.85 for more dramatic effect
-                const blur = nextProgress * 8; // Max 8px blur (softer)
-                const yOffset = nextProgress * -50; // Move up more for dramatic effect
-                const opacity = 1 - (nextProgress * 0.3); // Fade slightly
+                // Apply effects based on next card's approach (elegant, slower transitions)
+                const scale = 1 - (nextProgress * 0.08); // Subtle scale down to 0.92
+                const blur = nextProgress * 4; // Max 4px blur (very soft)
+                const yOffset = nextProgress * -20; // Gentle upward movement
+                const opacity = 1 - (nextProgress * 0.15); // Very subtle fade
 
-                cardInner.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s ease-out, opacity 0.4s ease-out';
+                cardInner.style.transition = 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease-out, opacity 0.6s ease-out';
                 cardInner.style.transform = `scale(${scale}) translateY(${yOffset}px)`;
                 cardInner.style.filter = `blur(${blur}px)`;
                 cardInner.style.opacity = opacity;
 
             } else if (!isStuck && rect.top > 0) {
                 // Card hasn't reached sticky point yet - normal state
-                cardInner.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), filter 0.4s ease-out, opacity 0.4s ease-out';
+                cardInner.style.transition = 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease-out, opacity 0.6s ease-out';
                 cardInner.style.transform = 'scale(1) translateY(0)';
                 cardInner.style.filter = 'blur(0px)';
                 cardInner.style.opacity = '1';
 
             } else if (rect.bottom <= 0) {
                 // Card has scrolled completely out - fully shrunk
-                cardInner.style.transform = 'scale(0.85) translateY(-50px)';
-                cardInner.style.filter = 'blur(8px)';
-                cardInner.style.opacity = '0.7';
+                cardInner.style.transform = 'scale(0.92) translateY(-20px)';
+                cardInner.style.filter = 'blur(4px)';
+                cardInner.style.opacity = '0.85';
             }
 
             // Video control - play when visible and not blurred

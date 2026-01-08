@@ -71,7 +71,15 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 80px;
     font-size: 16px;
+}
+
+/* Smooth scroll for all scrollable elements */
+*,
+*::before,
+*::after {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -618,20 +626,39 @@ video {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px 30px;
+    padding: 25px 35px;
     flex-shrink: 0;
+    /* Grid cell styling */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    min-width: 180px;
+    min-height: 100px;
+}
+
+.logo-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(220, 38, 38, 0.4);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(220, 38, 38, 0.15);
 }
 
 .logo-item img {
     width: auto;
-    height: 70px;
-    max-width: 280px;
+    height: 60px;
+    max-width: 150px;
     object-fit: contain;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.4s ease, opacity 0.3s ease, filter 0.3s ease;
+    filter: grayscale(30%) brightness(0.9);
 }
 
 .logo-item:hover img {
-    transform: scale(1.05);
+    transform: scale(1.1);
+    filter: grayscale(0%) brightness(1);
 }
 
 .logo-item span {
@@ -660,23 +687,62 @@ video {
 
     .scroll-logo-row {
         padding: var(--space-xs) 0;
+        /* Enable touch scrolling on mobile */
+        -webkit-overflow-scrolling: touch;
     }
 
     .scroll-logo-track {
         gap: 30px;
+        /* Smoother transitions for mobile */
+        transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
 
     .logo-item {
-        padding: 15px 20px;
+        padding: 18px 22px;
+        min-width: 140px;
+        min-height: 80px;
+        border-radius: 12px;
     }
 
     .logo-item img {
-        height: 90px;
-        max-width: 190px;
+        height: 45px;
+        max-width: 120px;
+        /* Smooth scaling on mobile touch */
+        transition: transform 0.3s ease, filter 0.3s ease;
     }
 
     .logo-item span {
         font-size: 0.9rem;
+    }
+
+    /* Smoother portfolio card transitions on mobile */
+    .portfolio-card-inner {
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 0.5s ease-out,
+            opacity 0.5s ease-out !important;
+    }
+}
+
+/* Respect reduced motion preferences for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+
+    .scroll-logo-track {
+        transition: none !important;
+    }
+
+    .portfolio-card-inner {
+        transition: none !important;
     }
 }
 
@@ -1410,7 +1476,7 @@ video {
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     /* Smooth motion parallax transitions */
     will-change: transform, filter;
-    transition: 
+    transition:
         transform 0.1s linear,
         filter 0.1s linear,
         box-shadow 0.3s ease;
