@@ -64,9 +64,9 @@ function initScrollDrivenLogos() {
         rowData.forEach((data) => {
             const diff = data.targetX - data.currentX;
 
-            // Smooth easing towards target
-            if (Math.abs(diff) > 0.5) {
-                data.currentX += diff * 0.15;
+            // Slower, smoother easing towards target
+            if (Math.abs(diff) > 0.1) {
+                data.currentX += diff * 0.05; // Slower easing (was 0.15)
                 needsAnimation = true;
             } else {
                 data.currentX = data.targetX;
@@ -98,7 +98,7 @@ function initScrollDrivenLogos() {
         if (scrollDelta !== 0) {
             rowData.forEach((data) => {
                 const multiplier = data.direction === 'left' ? 1 : -1;
-                data.targetX += scrollDelta * 2 * multiplier;
+                data.targetX += scrollDelta * 0.8 * multiplier; // Slower scroll (was 2)
             });
 
             if (!isAnimating) {

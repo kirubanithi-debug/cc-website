@@ -36,11 +36,12 @@
     --space-2xl: 3rem;
     --space-3xl: 4rem;
 
-    /* Transitions */
-    --transition-fast: 0.2s ease;
-    --transition-normal: 0.3s ease;
-    --transition-slow: 0.5s ease;
-    --transition-slower: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Transitions - Premium Smooth */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slower: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     /* Shadows */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -55,6 +56,33 @@
     --glass-border-strong: rgba(255, 255, 255, 0.15);
     --glass-blur: 20px;
     --glass-blur-strong: 40px;
+}
+
+/* Global Smooth Transitions for Interactive Elements */
+a,
+button,
+input,
+textarea,
+select,
+.btn,
+.nav-links a,
+.service-card,
+.career-benefits li,
+.portfolio-card-inner,
+.logo-item,
+.footer-links a,
+.social-icon,
+.dot {
+    transition: all var(--transition-normal);
+}
+
+/* Smooth Transform Origin */
+.service-card,
+.career-benefits li,
+.logo-item,
+.btn {
+    transform-origin: center center;
+    will-change: transform;
 }
 
 /* ========================================
@@ -2146,6 +2174,10 @@ video {
 
     .career-info {
         padding: var(--space-2xl);
+    }
+
+    .career-benefits {
+        grid-template-columns: repeat(4, 1fr);
     }
 
     .career-btn {
