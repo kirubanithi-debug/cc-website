@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ========================================
    SCROLL-DRIVEN LOGO ANIMATION
-   Logos move only when user scrolls
+   Optimized for smooth performance
    ======================================== */
 function initScrollDrivenLogos() {
     const logoRows = document.querySelectorAll('.scroll-logo-row');
@@ -27,92 +27,75 @@ function initScrollDrivenLogos() {
     if (!logoRows.length) return;
 
     let lastScrollY = window.scrollY;
-    let isInitialized = false;
+    let ticking = false;
 
     // Store data for each row
     const rowData = [];
 
     function initializeRows() {
-        rowData.length = 0;
         logoRows.forEach((row) => {
             const track = row.querySelector('.scroll-logo-track');
             if (!track) return;
+
             const direction = row.dataset.direction || 'left';
-            // Half width = one complete set of logos
             const halfWidth = track.scrollWidth / 2;
+
+            // Use will-change for GPU acceleration
+            track.style.willChange = 'transform';
+            track.style.transform = 'translate3d(0, 0, 0)';
+
             rowData.push({
                 track: track,
                 direction: direction,
                 currentX: 0,
-                targetX: 0,
                 halfWidth: halfWidth
             });
-            // Start at position 0 - logos visible from left
-            track.style.transform = `translateX(0px)`;
-            track.style.transition = 'transform 0.15s cubic-bezier(0.25, 0.1, 0.25, 1)';
         });
-        isInitialized = true;
     }
 
-    // Wait for images to load
-    setTimeout(initializeRows, 100);
+    // Initialize after images load
+    if (document.readyState === 'complete') {
+        initializeRows();
+    } else {
+        window.addEventListener('load', initializeRows);
+    }
 
     function updateLogos() {
-        if (!isInitialized) return;
-
         const currentScrollY = window.scrollY;
         const scrollDelta = currentScrollY - lastScrollY;
 
+        if (scrollDelta === 0) {
+            ticking = false;
+            return;
+        }
+
         rowData.forEach((data) => {
-            // Direction: left = move left when scroll down
             const dirMultiplier = data.direction === 'left' ? 1 : -1;
 
-            // Update target position based on scroll (SLOWER movement for elegant feel)
-            data.targetX += scrollDelta * 0.4 * dirMultiplier;
+            // Direct position update - no interpolation for snappier response
+            data.currentX += scrollDelta * 0.5 * dirMultiplier;
 
-            // Keep within bounds for seamless loop
-            if (data.targetX < 0) {
-                data.targetX += data.halfWidth;
-            } else if (data.targetX >= data.halfWidth) {
-                data.targetX = data.targetX % data.halfWidth;
+            // Seamless loop wrap
+            if (data.currentX < 0) {
+                data.currentX += data.halfWidth;
+            } else if (data.currentX >= data.halfWidth) {
+                data.currentX = data.currentX % data.halfWidth;
             }
 
-            // Smooth interpolation for buttery movement (slower easing)
-            data.currentX += (data.targetX - data.currentX) * 0.08;
-
-            // Apply transform with smooth transition
-            data.track.style.transform = `translateX(${-data.currentX}px)`;
+            // GPU-accelerated transform with translate3d
+            data.track.style.transform = `translate3d(${-data.currentX}px, 0, 0)`;
         });
 
         lastScrollY = currentScrollY;
+        ticking = false;
     }
 
-    // Continuous animation loop for smoother movement on all devices
-    let animationId;
-    function animate() {
-        updateLogos();
-        animationId = requestAnimationFrame(animate);
-    }
-
-    // Start animation loop
-    animate();
-
-    // Also respond to scroll events for immediate feedback
+    // Throttled scroll handler
     window.addEventListener('scroll', () => {
-        requestAnimationFrame(updateLogos);
-    }, { passive: true });
-
-    // Touch support for mobile devices
-    let touchStartY = 0;
-    window.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-        const touchY = e.touches[0].clientY;
-        const delta = touchStartY - touchY;
-        lastScrollY -= delta * 0.5; // Smoother touch response
-        touchStartY = touchY;
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateLogos);
+        }
     }, { passive: true });
 }
 

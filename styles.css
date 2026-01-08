@@ -702,6 +702,9 @@ video {
     gap: 100px;
     width: max-content;
     will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 .logo-item {
@@ -775,8 +778,7 @@ video {
 
     .scroll-logo-track {
         gap: 30px;
-        /* Smoother transitions for mobile */
-        transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+        /* No transition - JS handles transforms directly for performance */
     }
 
     .logo-item {
