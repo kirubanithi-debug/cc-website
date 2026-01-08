@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ========================================
    SCROLL-DRIVEN LOGO ANIMATION
-   CSS infinite loop + JS scroll boost
+   Moves ONLY when user scrolls
    ======================================== */
 function initScrollDrivenLogos() {
     const logoRows = document.querySelectorAll('.scroll-logo-row');
@@ -28,9 +28,10 @@ function initScrollDrivenLogos() {
 
     let lastScrollY = window.scrollY;
     const rowData = [];
+    let isAnimating = false;
 
     function initializeRows() {
-        logoRows.forEach((row, index) => {
+        logoRows.forEach((row) => {
             const track = row.querySelector('.scroll-logo-track');
             if (!track) return;
 
@@ -42,57 +43,71 @@ function initScrollDrivenLogos() {
 
             const totalWidth = track.scrollWidth / 3;
 
-            // Set initial position
-            track.style.transform = `translate3d(${direction === 'left' ? 0 : -totalWidth}px, 0, 0)`;
+            // GPU acceleration
+            track.style.willChange = 'transform';
+            track.style.backfaceVisibility = 'hidden';
+            track.style.transform = `translate3d(0, 0, 0)`;
 
             rowData.push({
                 track: track,
                 direction: direction,
-                currentX: direction === 'left' ? 0 : totalWidth,
-                totalWidth: totalWidth,
-                baseSpeed: direction === 'left' ? 0.3 : -0.3
+                currentX: 0,
+                targetX: 0,
+                totalWidth: totalWidth
             });
         });
-
-        // Start animation
-        requestAnimationFrame(animateLogos);
     }
 
-    function animateLogos() {
-        const currentScrollY = window.scrollY;
-        const scrollDelta = currentScrollY - lastScrollY;
+    function animate() {
+        let needsAnimation = false;
 
         rowData.forEach((data) => {
-            // Base auto-scroll + scroll boost
-            let speed = data.baseSpeed;
+            const diff = data.targetX - data.currentX;
 
-            if (scrollDelta !== 0) {
-                const boost = scrollDelta * 1.5 * (data.direction === 'left' ? 1 : -1);
-                speed += boost;
+            // Smooth easing towards target
+            if (Math.abs(diff) > 0.5) {
+                data.currentX += diff * 0.15;
+                needsAnimation = true;
+            } else {
+                data.currentX = data.targetX;
             }
 
-            data.currentX += speed;
-
-            // Seamless wrap - reset position when one full set has passed
-            if (data.direction === 'left') {
-                if (data.currentX >= data.totalWidth) {
-                    data.currentX -= data.totalWidth;
-                } else if (data.currentX < 0) {
-                    data.currentX += data.totalWidth;
-                }
-            } else {
-                if (data.currentX <= 0) {
-                    data.currentX += data.totalWidth;
-                } else if (data.currentX >= data.totalWidth * 2) {
-                    data.currentX -= data.totalWidth;
-                }
+            // Seamless loop wrap
+            if (data.currentX >= data.totalWidth) {
+                data.currentX -= data.totalWidth;
+                data.targetX -= data.totalWidth;
+            } else if (data.currentX < 0) {
+                data.currentX += data.totalWidth;
+                data.targetX += data.totalWidth;
             }
 
             data.track.style.transform = `translate3d(${-data.currentX}px, 0, 0)`;
         });
 
+        if (needsAnimation) {
+            requestAnimationFrame(animate);
+        } else {
+            isAnimating = false;
+        }
+    }
+
+    function onScroll() {
+        const currentScrollY = window.scrollY;
+        const scrollDelta = currentScrollY - lastScrollY;
+
+        if (scrollDelta !== 0) {
+            rowData.forEach((data) => {
+                const multiplier = data.direction === 'left' ? 1 : -1;
+                data.targetX += scrollDelta * 2 * multiplier;
+            });
+
+            if (!isAnimating) {
+                isAnimating = true;
+                requestAnimationFrame(animate);
+            }
+        }
+
         lastScrollY = currentScrollY;
-        requestAnimationFrame(animateLogos);
     }
 
     // Initialize after images load
@@ -101,6 +116,9 @@ function initScrollDrivenLogos() {
     } else {
         window.addEventListener('load', () => setTimeout(initializeRows, 200));
     }
+
+    // Only animate on scroll
+    window.addEventListener('scroll', onScroll, { passive: true });
 }
 
 /* ========================================

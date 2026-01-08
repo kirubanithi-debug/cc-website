@@ -2028,6 +2028,104 @@ video {
 }
 
 /* ========================================
+   CAREER SECTION
+   ======================================== */
+.career-section {
+    padding: var(--space-3xl) 0;
+    background: linear-gradient(180deg, #0a0a0a 0%, #0d0d0d 50%, #0a0a0a 100%);
+    position: relative;
+}
+
+.career-section .section-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.career-content {
+    display: flex;
+    justify-content: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.career-info {
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: var(--space-xl);
+}
+
+.career-info h3 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--white);
+    margin-bottom: var(--space-lg);
+    letter-spacing: 0.02em;
+}
+
+.career-benefits {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.career-benefits li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.career-benefits li:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(220, 38, 38, 0.3);
+    transform: translateX(5px);
+}
+
+.benefit-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.career-benefits li strong {
+    display: block;
+    color: var(--white);
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.career-benefits li p {
+    color: var(--gray-400);
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.career-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Desktop layout for Career */
+@media (min-width: 768px) {
+    .career-content {
+        max-width: 800px;
+    }
+
+    .career-btn {
+        width: auto;
+    }
+}
+
+/* ========================================
    FOOTER - Premium Glass Design
    ======================================== */
 .footer {
