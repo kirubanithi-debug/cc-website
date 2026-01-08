@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ========================================
    SCROLL-DRIVEN LOGO ANIMATION
-   Moves ONLY when user scrolls
+   Moves ONLY when user scrolls - stops immediately when scroll stops
    ======================================== */
 function initScrollDrivenLogos() {
     const logoRows = document.querySelectorAll('.scroll-logo-row');
@@ -28,7 +28,8 @@ function initScrollDrivenLogos() {
 
     let lastScrollY = window.scrollY;
     const rowData = [];
-    let isAnimating = false;
+    let scrollTimeout = null;
+    let isScrolling = false;
 
     function initializeRows() {
         logoRows.forEach((row) => {
@@ -52,43 +53,9 @@ function initScrollDrivenLogos() {
                 track: track,
                 direction: direction,
                 currentX: 0,
-                targetX: 0,
                 totalWidth: totalWidth
             });
         });
-    }
-
-    function animate() {
-        let needsAnimation = false;
-
-        rowData.forEach((data) => {
-            const diff = data.targetX - data.currentX;
-
-            // Slower, smoother easing towards target
-            if (Math.abs(diff) > 0.1) {
-                data.currentX += diff * 0.05; // Slower easing (was 0.15)
-                needsAnimation = true;
-            } else {
-                data.currentX = data.targetX;
-            }
-
-            // Seamless loop wrap
-            if (data.currentX >= data.totalWidth) {
-                data.currentX -= data.totalWidth;
-                data.targetX -= data.totalWidth;
-            } else if (data.currentX < 0) {
-                data.currentX += data.totalWidth;
-                data.targetX += data.totalWidth;
-            }
-
-            data.track.style.transform = `translate3d(${-data.currentX}px, 0, 0)`;
-        });
-
-        if (needsAnimation) {
-            requestAnimationFrame(animate);
-        } else {
-            isAnimating = false;
-        }
     }
 
     function onScroll() {
@@ -96,15 +63,33 @@ function initScrollDrivenLogos() {
         const scrollDelta = currentScrollY - lastScrollY;
 
         if (scrollDelta !== 0) {
+            isScrolling = true;
+
+            // Move logos directly based on scroll - slow multiplier
             rowData.forEach((data) => {
                 const multiplier = data.direction === 'left' ? 1 : -1;
-                data.targetX += scrollDelta * 0.8 * multiplier; // Slower scroll (was 2)
+                data.currentX += scrollDelta * 0.3 * multiplier; // Very slow movement
+
+                // Seamless loop wrap
+                if (data.currentX >= data.totalWidth) {
+                    data.currentX -= data.totalWidth;
+                } else if (data.currentX < 0) {
+                    data.currentX += data.totalWidth;
+                }
+
+                // Apply transform immediately
+                data.track.style.transform = `translate3d(${-data.currentX}px, 0, 0)`;
             });
 
-            if (!isAnimating) {
-                isAnimating = true;
-                requestAnimationFrame(animate);
+            // Clear previous timeout
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
             }
+
+            // Set timeout to detect scroll stop
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 50);
         }
 
         lastScrollY = currentScrollY;
