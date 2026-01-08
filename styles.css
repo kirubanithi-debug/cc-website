@@ -2044,8 +2044,8 @@ video {
 .career-content {
     display: flex;
     justify-content: center;
-    max-width: 700px;
-    margin: 0 auto;
+    width: 100%;
+    padding: 0 var(--space-md);
 }
 
 .career-info {
@@ -2055,6 +2055,8 @@ video {
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: var(--space-xl);
+    width: 100%;
+    max-width: 1200px;
 }
 
 .career-info h3 {
@@ -2063,12 +2065,13 @@ video {
     color: var(--white);
     margin-bottom: var(--space-lg);
     letter-spacing: 0.02em;
+    text-align: center;
 }
 
 .career-benefits {
     list-style: none;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--space-md);
     margin-bottom: var(--space-xl);
 }
@@ -2077,7 +2080,7 @@ video {
     display: flex;
     align-items: flex-start;
     gap: var(--space-md);
-    padding: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
     background: rgba(255, 255, 255, 0.03);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -2087,24 +2090,32 @@ video {
 .career-benefits li:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(220, 38, 38, 0.3);
-    transform: translateX(5px);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .benefit-icon {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 12px;
 }
 
 .career-benefits li strong {
     display: block;
     color: var(--white);
-    font-size: 1rem;
+    font-size: 1.1rem;
     margin-bottom: 4px;
 }
 
 .career-benefits li p {
     color: var(--gray-400);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     margin: 0;
     line-height: 1.5;
 }
@@ -2112,16 +2123,35 @@ video {
 .career-btn {
     width: 100%;
     justify-content: center;
+    padding: var(--space-md) var(--space-2xl);
+    font-size: 1rem;
+}
+
+/* Tablet layout for Career */
+@media (min-width: 640px) {
+    .career-benefits {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .career-info h3 {
+        font-size: 2.2rem;
+    }
 }
 
 /* Desktop layout for Career */
 @media (min-width: 768px) {
     .career-content {
-        max-width: 800px;
+        padding: 0 var(--space-lg);
+    }
+
+    .career-info {
+        padding: var(--space-2xl);
     }
 
     .career-btn {
         width: auto;
+        margin: 0 auto;
+        display: flex;
     }
 }
 
