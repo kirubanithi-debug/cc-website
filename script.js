@@ -19,18 +19,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ========================================
    SCROLL-DRIVEN LOGO ANIMATION
-   Optimized for smooth performance
+   Moves only on scroll with smooth easing
    ======================================== */
 function initScrollDrivenLogos() {
     const logoRows = document.querySelectorAll('.scroll-logo-row');
 
     if (!logoRows.length) return;
 
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-
     // Store data for each row
     const rowData = [];
+    let lastScrollY = window.scrollY;
+    let isAnimating = false;
 
     function initializeRows() {
         logoRows.forEach((row) => {
@@ -40,63 +39,85 @@ function initScrollDrivenLogos() {
             const direction = row.dataset.direction || 'left';
             const halfWidth = track.scrollWidth / 2;
 
-            // Use will-change for GPU acceleration
+            // GPU acceleration
             track.style.willChange = 'transform';
-            track.style.transform = 'translate3d(0, 0, 0)';
+            track.style.backfaceVisibility = 'hidden';
 
             rowData.push({
                 track: track,
                 direction: direction,
                 currentX: 0,
+                targetX: 0,
                 halfWidth: halfWidth
             });
         });
     }
 
-    // Initialize after images load
-    if (document.readyState === 'complete') {
-        initializeRows();
-    } else {
-        window.addEventListener('load', initializeRows);
-    }
-
-    function updateLogos() {
-        const currentScrollY = window.scrollY;
-        const scrollDelta = currentScrollY - lastScrollY;
-
-        if (scrollDelta === 0) {
-            ticking = false;
-            return;
-        }
+    function animate() {
+        let needsUpdate = false;
 
         rowData.forEach((data) => {
-            const dirMultiplier = data.direction === 'left' ? 1 : -1;
+            // Smooth interpolation - ease towards target
+            const diff = data.targetX - data.currentX;
 
-            // Direct position update - faster scroll speed
-            data.currentX += scrollDelta * 1.5 * dirMultiplier;
+            if (Math.abs(diff) > 0.1) {
+                // Smooth easing factor (0.1 = smoother, 0.2 = faster response)
+                data.currentX += diff * 0.12;
+                needsUpdate = true;
+            } else {
+                data.currentX = data.targetX;
+            }
 
             // Seamless loop wrap
             if (data.currentX < 0) {
                 data.currentX += data.halfWidth;
+                data.targetX += data.halfWidth;
             } else if (data.currentX >= data.halfWidth) {
-                data.currentX = data.currentX % data.halfWidth;
+                data.currentX -= data.halfWidth;
+                data.targetX -= data.halfWidth;
             }
 
-            // GPU-accelerated transform with translate3d
+            // Apply transform
             data.track.style.transform = `translate3d(${-data.currentX}px, 0, 0)`;
         });
 
-        lastScrollY = currentScrollY;
-        ticking = false;
+        if (needsUpdate) {
+            requestAnimationFrame(animate);
+        } else {
+            isAnimating = false;
+        }
     }
 
-    // Throttled scroll handler
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            ticking = true;
-            requestAnimationFrame(updateLogos);
+    function onScroll() {
+        const currentScrollY = window.scrollY;
+        const scrollDelta = currentScrollY - lastScrollY;
+
+        if (scrollDelta !== 0) {
+            rowData.forEach((data) => {
+                const dirMultiplier = data.direction === 'left' ? 1 : -1;
+                // Update target position based on scroll
+                data.targetX += scrollDelta * 2 * dirMultiplier;
+            });
+
+            // Start animation if not already running
+            if (!isAnimating) {
+                isAnimating = true;
+                requestAnimationFrame(animate);
+            }
         }
-    }, { passive: true });
+
+        lastScrollY = currentScrollY;
+    }
+
+    // Initialize after page load
+    if (document.readyState === 'complete') {
+        setTimeout(initializeRows, 100);
+    } else {
+        window.addEventListener('load', () => setTimeout(initializeRows, 100));
+    }
+
+    // Scroll listener
+    window.addEventListener('scroll', onScroll, { passive: true });
 }
 
 /* ========================================
@@ -123,11 +144,11 @@ function initNavbar() {
             // At top of page - always show
             navbar.classList.remove('nav-hidden');
         } else if (currentScroll > lastScroll && currentScroll > 80) {
-            // Scrolling down & past header - hide navbar
-            navbar.classList.add('nav-hidden');
-        } else if (currentScroll < lastScroll) {
-            // Scrolling up - show navbar
+            // Scrolling down & past header - show navbar
             navbar.classList.remove('nav-hidden');
+        } else if (currentScroll < lastScroll) {
+            // Scrolling up - hide navbar
+            navbar.classList.add('nav-hidden');
         }
 
         lastScroll = currentScroll;
