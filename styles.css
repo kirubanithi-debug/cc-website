@@ -2511,6 +2511,14 @@ video {
         text-align: left;
     }
 
+    .footer .logo {
+        justify-content: flex-start;
+    }
+
+    .footer-social {
+        justify-content: flex-start;
+    }
+
     .footer-links {
         justify-content: flex-end;
         gap: var(--space-md) var(--space-xl);
