@@ -667,8 +667,8 @@ function initScrollAnimations() {
 function initContactForm() {
     const form = document.getElementById('contactForm');
 
-    // TODO: Replace with your Google Apps Script Web App URL
-    const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+    // Google Apps Script Web App URL for form submissions
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNkOa-E6_Ojy1TfME0xxnK-IdpAwwpTvpVCK3KyC3wYWooFI2cWp7hoD09YgfnhtWDyw/exec';
 
     if (!form) return;
 
