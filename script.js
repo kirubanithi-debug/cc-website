@@ -668,7 +668,7 @@ function initContactForm() {
     const form = document.getElementById('contactForm');
 
     // Google Apps Script Web App URL for form submissions
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNkOa-E6_Ojy1TfME0xxnK-IdpAwwpTvpVCK3KyC3wYWooFI2cWp7hoD09YgfnhtWDyw/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpGlmgyVQ07CuYLSjoxm8Y8BmYJU7QGhTRrncSD7w2Nt4LgcXblDCmUiPZy-hHTtlgNg/exec';
 
     if (!form) return;
 
