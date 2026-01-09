@@ -2085,6 +2085,17 @@ video {
     padding: var(--space-xl);
     width: 100%;
     max-width: 1200px;
+    text-align: center;
+}
+
+.career-text {
+    color: var(--gray-300);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: var(--space-lg);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .career-info h3 {
