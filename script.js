@@ -337,13 +337,15 @@ function initStackedCarousel() {
         const volumeOn = volumeBtn.querySelector('.volume-on');
         const volumeOff = volumeBtn.querySelector('.volume-off');
 
+        // When muted: show volume-off (X icon), hide volume-on (sound waves)
+        // When unmuted: show volume-on (sound waves), hide volume-off (X icon)
         if (isMuted) {
-            volumeOn.classList.remove('hidden');
-            volumeOff.classList.add('hidden');
-            volumeBtn.classList.remove('unmuted');
-        } else {
             volumeOn.classList.add('hidden');
             volumeOff.classList.remove('hidden');
+            volumeBtn.classList.remove('unmuted');
+        } else {
+            volumeOn.classList.remove('hidden');
+            volumeOff.classList.add('hidden');
             volumeBtn.classList.add('unmuted');
         }
 
