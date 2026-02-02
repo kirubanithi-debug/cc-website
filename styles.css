@@ -5,10 +5,10 @@
 
 /* CSS Custom Properties */
 :root {
-    /* Colors - Red Theme */
-    --primary-red: #DC2626;
-    --primary-red-dark: #B91C1C;
-    --primary-red-light: #EF4444;
+    /* Colors - Orange Theme */
+    --primary-red: #FF6B35;
+    --primary-red-dark: #E85D2C;
+    --primary-red-light: #FF8C61;
     --white: #FFFFFF;
     --off-white: #F0F0F0;
     --black: #0A0A0A;
@@ -292,10 +292,10 @@ video {
 }
 
 .nav-container {
-    max-width: 1400px;
+    max-width: 96%;
     width: 100%;
-    margin: 0 auto;
-    padding: 0 var(--space-lg);
+    margin: 0;
+    padding: 0 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -703,6 +703,75 @@ video {
     background: var(--gray-200);
     transform: translateY(-2px);
     box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+/* ========================================
+   APPLE GLASSY BUTTON - Premium Style
+   ======================================== */
+.btn-glass {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient shine effect */
+.btn-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.15),
+            transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-glass:hover::before {
+    left: 100%;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(220, 38, 38, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.btn-glass:active {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-glass svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-glass:hover svg {
+    transform: translateX(4px);
 }
 
 /* ========================================
@@ -2466,7 +2535,7 @@ video {
 
     .nav-container {
         height: 70px;
-        padding: 0 var(--space-2xl);
+        padding: 0 2rem;
     }
 
     .nav-links {
@@ -2477,7 +2546,7 @@ video {
         flex-direction: row;
         align-items: center;
         padding: 0;
-        gap: var(--space-md);
+        gap: 1.25rem;
         box-shadow: none;
         border: none;
         backdrop-filter: none;
@@ -2486,8 +2555,8 @@ video {
     .nav-links a {
         font-family: var(--font-primary);
         font-size: 0.85rem;
-        letter-spacing: 0.08em;
-        padding: var(--space-xs) var(--space-xs);
+        letter-spacing: 0.06em;
+        padding: 0.5rem 0;
     }
 
     .nav-cta {
